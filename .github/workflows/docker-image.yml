@@ -15,4 +15,4 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build . --file ./docker/php-nginx/Dockerfile --tag weather-bot-lornkarios:$(date +%s)
+      run: docker build . --file ./docker/php-nginx/Dockerfile --tag lornkarios/weather-api-bot:$(date +%s)
