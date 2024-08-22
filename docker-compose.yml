@@ -1,0 +1,45 @@
+services:
+  mysql:
+    image: mysql:8.0.25
+    restart: on-failure
+    container_name: ${DOCKER_NAME}_mysql
+    volumes:
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/mysql/data:/var/lib/mysql
+    ports:
+      - ${DB_PORT}:3306
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - weather_bot_network
+
+  php:
+    container_name: ${DOCKER_NAME}_php
+    restart: on-failure
+    working_dir: /var/www/html
+    build:
+      context: .
+      dockerfile: ./docker/php-nginx/Dockerfile
+      args:
+        XDEBUG_FLAG: $XDEBUG_FLAG
+    env_file:
+      - .env
+    user: www
+    volumes:
+      - ./app:/var/www/html
+    environment:
+      PHP_IDE_CONFIG: "serverName=localhost"
+    entrypoint: ["bash", "-c","nginx -t & composer install & nginx & php-fpm"]
+    ports:
+      - 80:8080
+      - "9000:9000"
+    networks:
+      - weather_bot_network
+
+networks:
+  weather_bot_network:
+    driver: bridge
+    name: 'weather_bot_network'
