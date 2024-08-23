@@ -3,17 +3,12 @@ FROM php:8.2.17-fpm-bullseye
 RUN apt-get update \
     && apt-get install -y  \
         ca-certificates  \
-        librdkafka-dev  \
         libzip-dev  \
         libonig-dev \
         libpng-dev  \
         git \
-        librdkafka-dev \
         nginx \
-	&& pecl install rdkafka redis \
-    && pecl clear-cache \
-    && docker-php-ext-install bcmath pdo pdo_mysql zip gd mbstring exif pcntl  \
-    && docker-php-ext-enable redis rdkafka
+    && docker-php-ext-install bcmath pdo pdo_mysql zip gd mbstring exif pcntl
 
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
