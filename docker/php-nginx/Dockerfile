@@ -54,7 +54,7 @@ COPY --chown=www:www ./app /var/www/html
 
 WORKDIR /var/www/html
 
-#RUN composer install --optimize-autoloader --no-dev
+RUN composer install --optimize-autoloader --no-dev
 
 USER www
 
