@@ -30,6 +30,7 @@ services:
     user: www
     volumes:
       - ./app:/var/www/html
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
     environment:
       PHP_IDE_CONFIG: "serverName=localhost"
     entrypoint: ["bash", "-c","nginx -t & composer install & nginx & php-fpm"]
