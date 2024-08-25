@@ -2,13 +2,10 @@
 
 namespace App\Service\WebhookHandler;
 
-use DefStudio\Telegraph\DTO\InlineQuery;
-use DefStudio\Telegraph\DTO\InlineQueryResult;
-use DefStudio\Telegraph\DTO\User;
-use DefStudio\Telegraph\Facades\Telegraph;
 use DefStudio\Telegraph\Handlers\WebhookHandler as AbstractWebhookHandler;
+use DefStudio\Telegraph\Keyboard\Button;
 use DefStudio\Telegraph\Keyboard\Keyboard;
-use Illuminate\Support\Stringable;
+use DefStudio\Telegraph\Keyboard\ReplyKeyboard;
 
 class WebhookHandler extends AbstractWebhookHandler
 {
@@ -22,31 +19,18 @@ class WebhookHandler extends AbstractWebhookHandler
 
     public function menu()
     {
-        $this->chat->message('Меню!')->send();
-        if(!is_null($this->callbackQuery)){
-            $this->reply('Меню2!');
-        }else{
-            $this->chat->message('Меню!')->send();
+        $this->chat->message(__('telegram_bot.menu.header'))
+            ->keyboard(fn(Keyboard $keyboard) => $keyboard
+                ->buttons([
+                    Button::make(__('telegram_bot.menu.weather_today'))->action('weather_today'),
+                    Button::make(__('telegram_bot.menu.weather_3d'))->action('weather_3d'),
+                    Button::make(__('telegram_bot.menu.weather_week'))->action('weather_week'),
+                ]))
+            ->replyKeyboard(fn(ReplyKeyboard $replyKeyboard) => $replyKeyboard
+                ->button(__('telegram_bot.menu.set_location'))->requestLocation())
+            ->send();
+        if (!is_null($this->callbackQuery)) {
+            $this->reply('Готово!');
         }
-    }
-
-    protected function handleChatMemberJoined(User $member): void
-    {
-        // .. do nothing
-    }
-
-    protected function handleChatMemberLeft(User $member): void
-    {
-        // .. do nothing
-    }
-
-    protected function handleChatMessage(Stringable $text): void
-    {
-        // .. do nothing
-    }
-
-    protected function handleInlineQuery(InlineQuery $inlineQuery): void
-    {
-        // .. do nothing
     }
 }
