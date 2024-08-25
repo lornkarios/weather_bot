@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\JsonAcceptHeader;
 use App\Http\Middleware\RequestLogger;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -13,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(RequestLogger::class);
+        $middleware->append(JsonAcceptHeader::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
