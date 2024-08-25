@@ -32,12 +32,10 @@ RUN docker-php-ext-enable opcache
 RUN docker-php-ext-install sockets
 
 RUN apt-get install -y nginx && useradd -u 1000 -m www
-RUN apt-get install -y certbot
 
 COPY ./docker/php-nginx/www.conf               /usr/local/etc/php-fpm.d/zz-docker.conf
 COPY ./docker/php-nginx/conf.d/php.ini         /usr/local/etc/php/conf.d/php.iniconf.d
 COPY ./docker/php-nginx/nginx.conf             /etc/nginx/nginx.conf
-COPY ./docker/php-nginx/certbot.ini            /etc/letsencrypt/cli.ini
 COPY ./docker/php-nginx/entrypoint.sh          /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh \
