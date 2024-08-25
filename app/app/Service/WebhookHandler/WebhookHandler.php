@@ -3,7 +3,9 @@
 namespace App\Service\WebhookHandler;
 
 use DefStudio\Telegraph\DTO\InlineQuery;
+use DefStudio\Telegraph\DTO\InlineQueryResult;
 use DefStudio\Telegraph\DTO\User;
+use DefStudio\Telegraph\Facades\Telegraph;
 use DefStudio\Telegraph\Handlers\WebhookHandler as AbstractWebhookHandler;
 use DefStudio\Telegraph\Keyboard\Keyboard;
 use Illuminate\Support\Stringable;
@@ -21,6 +23,11 @@ class WebhookHandler extends AbstractWebhookHandler
     public function menu()
     {
         $this->chat->message('Меню!')->send();
+        if(!is_null($this->callbackQuery)){
+            $this->reply('Меню2!');
+        }else{
+            $this->chat->message('Меню!')->send();
+        }
     }
 
     protected function handleChatMemberJoined(User $member): void
