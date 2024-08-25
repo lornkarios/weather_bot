@@ -1,5 +1,6 @@
 <?php
 
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -18,7 +19,7 @@ return [
     |
     */
 
-    'default' => env('LOG_CHANNEL', 'stack'),
+    'default' => env('LOG_CHANNEL', 'json_stdout'),
 
     /*
     |--------------------------------------------------------------------------
@@ -103,6 +104,16 @@ return [
                 'stream' => 'php://stderr',
             ],
             'processors' => [PsrLogMessageProcessor::class],
+        ],
+
+        'json_stdout' => [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'level' => env('LOG_LEVEL', 'debug'),
+            'with' => [
+                'stream' => 'php://stdout',
+            ],
+            'formatter' => JsonFormatter::class
         ],
 
         'syslog' => [
