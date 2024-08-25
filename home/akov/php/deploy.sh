@@ -11,5 +11,6 @@ docker run -p 80:8080 -p 9000:9000 \
   --name php -d --env-file=.env \
   --network=weather_bot_network \
   -v ./.well-known:/var/www/html/.well-known \
+  -v ./certificates:/etc/letsencrypt/live \
   lornkarios/weather-api-bot
 echo "Finish deploying!"
