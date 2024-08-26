@@ -15,11 +15,12 @@ class LocationRepository
 
     public function saveLocation(TelegraphChat $chat, LocationDto $location): Location
     {
-       return Location::query()->updateOrCreate([
+       return Location::query()->updateOrCreate(
+           ['chat_id' => $chat->id],[
             'lon' => $location->longitude,
             'lat' => $location->latitude,
             'name' => $location->name,
             'chat_id' => $chat->id,
-        ], ['chat_id' => $chat->id]);
+        ]);
     }
 }
