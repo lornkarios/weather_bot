@@ -3,7 +3,7 @@
 namespace App\Service\Location;
 
 use App\Models\Location;
-use DefStudio\Telegraph\DTO\Location as TelegraphLocation;
+use App\Service\LocationApi\Dto\Location as LocationDto;
 use DefStudio\Telegraph\Models\TelegraphChat;
 
 class LocationRepository
@@ -13,11 +13,12 @@ class LocationRepository
         return Location::forChat($chat)->first();
     }
 
-    public function saveLocation(TelegraphChat $chat, TelegraphLocation $location): void
+    public function saveLocation(TelegraphChat $chat, LocationDto $location): Location
     {
-        Location::query()->upsert([
-            'lon' => $location->longitude(),
-            'lat' => $location->latitude(),
+       return Location::query()->updateOrCreate([
+            'lon' => $location->longitude,
+            'lat' => $location->latitude,
+            'name' => $location->name,
             'chat_id' => $chat->id,
         ], ['chat_id' => $chat->id]);
     }

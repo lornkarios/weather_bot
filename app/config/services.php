@@ -38,4 +38,8 @@ return [
     'open_meteo' => [
         'url' => env('WEATHER_API_URL', 'https://api.open-meteo.com'),
     ],
+    'yandex_location_client' => [
+        'url' => env('YANDEX_LOCATION_URL', 'https://geocode-maps.yandex.ru'),
+        'token' =>env('YANDEX_LOCATION_TOKEN'),
+    ],
 ];

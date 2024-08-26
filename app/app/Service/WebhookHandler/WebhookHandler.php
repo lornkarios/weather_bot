@@ -2,7 +2,10 @@
 
 namespace App\Service\WebhookHandler;
 
+use App\Models\Location as LocationModel;
 use App\Service\Location\LocationRepository;
+use App\Service\LocationApi\Dto\Location;
+use App\Service\LocationApi\LocationApiClient;
 use App\Service\WeatherApi\WeatherApiClient;
 use DefStudio\Telegraph\Handlers\WebhookHandler as AbstractWebhookHandler;
 use DefStudio\Telegraph\Keyboard\Button;
@@ -16,6 +19,7 @@ class WebhookHandler extends AbstractWebhookHandler
     public function __construct(
         private LocationRepository $locationRepository,
         private WeatherApiClient $weatherApiClient,
+        private LocationApiClient $locationApiClient,
     ) {
         parent::__construct();
     }
@@ -32,7 +36,7 @@ class WebhookHandler extends AbstractWebhookHandler
     {
         $location = $this->locationRepository->forChatFirst($this->chat);
         if ($location) {
-            $this->sendFullMenu();
+            $this->sendFullMenu($location);
         } else {
             $this->sendRequestLocationMenu();
         }
@@ -52,13 +56,28 @@ class WebhookHandler extends AbstractWebhookHandler
 
     protected function handleChatMessage(Stringable $text): void
     {
-        $location = $this->message?->location();
-        if (is_null($location)) {
+        $telegraphLocation = $this->message?->location();
+        $text = $this->message?->text();
+        if (is_null($telegraphLocation) && empty($text)) {
             return;
         }
-        $this->locationRepository->saveLocation($this->chat, $location);
+        if (is_null($telegraphLocation)) {
+            $location = $this->locationApiClient->findLocation($text);
+            if (is_null($location)) {
+                $this->chat->message(__('telegram_bot.location_not_found'))->send();
+                return;
+            }
+        } else {
+            $location = new Location(
+                $telegraphLocation->longitude(),
+                $telegraphLocation->latitude(),
+                $telegraphLocation->latitude() . ' ' . $telegraphLocation->longitude(),
+            );
+        }
+
+        $locationModel = $this->locationRepository->saveLocation($this->chat, $location);
         $this->chat->message(__('telegram_bot.location_saved'))->send();
-        $this->sendFullMenu();
+        $this->sendFullMenu($locationModel);
     }
 
     public function weather_today()
@@ -94,9 +113,11 @@ class WebhookHandler extends AbstractWebhookHandler
         $this->reply('');
     }
 
-    private function sendFullMenu(): void
+    private function sendFullMenu(LocationModel $location): void
     {
-        $this->messageWithKeyboardMenuSend($this->chat->message(__('telegram_bot.menu.header')));
+        $this->messageWithKeyboardMenuSend(
+            $this->chat->message(__('telegram_bot.menu.header', ['location' => $location->name]))
+        );
     }
 
     private function messageWithKeyboardMenuSend(Telegraph $message): void

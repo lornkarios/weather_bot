@@ -25,6 +25,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder|Location whereLat($value)
  * @method static Builder|Location whereLon($value)
  * @method static Builder|Location whereUpdatedAt($value)
+ * @property string $name
+ * @method static Builder|Location whereName($value)
  * @mixin \Eloquent
  */
 class Location extends Model
