@@ -118,7 +118,8 @@ class WebhookHandler extends AbstractWebhookHandler
     {
         $this->chat->message(__('telegram_bot.request_location'))
             ->replyKeyboard(fn(ReplyKeyboard $replyKeyboard) => $replyKeyboard
-                ->button(__('telegram_bot.menu.send_location'))->requestLocation())
+                ->button(__('telegram_bot.menu.send_location'))->requestLocation()
+                ->resize())
             ->send();
     }
 }
