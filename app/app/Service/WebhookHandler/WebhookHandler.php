@@ -69,6 +69,7 @@ class WebhookHandler extends AbstractWebhookHandler
             $this->chat
                 ->message(view('today', ['weather' => $weatherForDay])->render())
         );
+        $this->reply('');
     }
 
     public function weather_3d()
@@ -79,6 +80,7 @@ class WebhookHandler extends AbstractWebhookHandler
             $this->chat
                 ->message(view('3days', ['weatherCollection' => $weatherCollection])->render())
         );
+        $this->reply('');
     }
 
     public function weather_week()
@@ -89,6 +91,7 @@ class WebhookHandler extends AbstractWebhookHandler
             $this->chat
                 ->message(view('week', ['weatherCollection' => $weatherCollection])->render())
         );
+        $this->reply('');
     }
 
     private function sendFullMenu(): void
