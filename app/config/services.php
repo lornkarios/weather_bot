@@ -35,4 +35,7 @@ return [
         ],
     ],
 
+    'open_meteo' => [
+        'url' => env('WEATHER_API_URL', 'https://api.open-meteo.com'),
+    ],
 ];

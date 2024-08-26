@@ -3,16 +3,20 @@
 namespace App\Service\WebhookHandler;
 
 use App\Service\Location\LocationRepository;
+use App\Service\WeatherApi\WeatherApiClient;
 use DefStudio\Telegraph\Handlers\WebhookHandler as AbstractWebhookHandler;
 use DefStudio\Telegraph\Keyboard\Button;
 use DefStudio\Telegraph\Keyboard\Keyboard;
 use DefStudio\Telegraph\Keyboard\ReplyKeyboard;
+use DefStudio\Telegraph\Telegraph;
 use Illuminate\Support\Stringable;
 
 class WebhookHandler extends AbstractWebhookHandler
 {
-    public function __construct(private LocationRepository $locationRepository)
-    {
+    public function __construct(
+        private LocationRepository $locationRepository,
+        private WeatherApiClient $weatherApiClient,
+    ) {
         parent::__construct();
     }
 
@@ -57,19 +61,53 @@ class WebhookHandler extends AbstractWebhookHandler
         $this->sendFullMenu();
     }
 
+    public function weather_today()
+    {
+        $location = $this->locationRepository->forChatFirst($this->chat);
+        $weatherForDay = $this->weatherApiClient->today($location);
+        $this->messageWithKeyboardMenuSend(
+            $this->chat
+                ->message(view('today', ['weather' => $weatherForDay])->render())
+        );
+    }
+
+    public function weather_3d()
+    {
+        $location = $this->locationRepository->forChatFirst($this->chat);
+        $weatherCollection = $this->weatherApiClient->for3d($location);
+        $this->messageWithKeyboardMenuSend(
+            $this->chat
+                ->message(view('3days', ['weatherCollection' => $weatherCollection])->render())
+        );
+    }
+
+    public function weather_week()
+    {
+        $location = $this->locationRepository->forChatFirst($this->chat);
+        $weatherCollection = $this->weatherApiClient->forWeek($location);
+        $this->messageWithKeyboardMenuSend(
+            $this->chat
+                ->message(view('week', ['weatherCollection' => $weatherCollection])->render())
+        );
+    }
+
     private function sendFullMenu(): void
     {
-        $this->chat->message(__('telegram_bot.menu.header'))
-            ->keyboard(fn(Keyboard $keyboard) => $keyboard
-                ->row([
-                    Button::make(__('telegram_bot.menu.change_location'))->action('request_location'),
-                    Button::make(__('telegram_bot.menu.weather_today'))->action('weather_today'),
-                ])
-                ->row([
-                    Button::make(__('telegram_bot.menu.weather_3d'))->action('weather_3d'),
-                    Button::make(__('telegram_bot.menu.weather_week'))->action('weather_week'),
-                ])
-            )
+        $this->messageWithKeyboardMenuSend($this->chat->message(__('telegram_bot.menu.header')));
+    }
+
+    private function messageWithKeyboardMenuSend(Telegraph $message): void
+    {
+        $message->keyboard(fn(Keyboard $keyboard) => $keyboard
+            ->row([
+                Button::make(__('telegram_bot.menu.change_location'))->action('request_location'),
+                Button::make(__('telegram_bot.menu.weather_today'))->action('weather_today'),
+            ])
+            ->row([
+                Button::make(__('telegram_bot.menu.weather_3d'))->action('weather_3d'),
+                Button::make(__('telegram_bot.menu.weather_week'))->action('weather_week'),
+            ])
+        )
             ->send();
     }
 
@@ -79,17 +117,5 @@ class WebhookHandler extends AbstractWebhookHandler
             ->replyKeyboard(fn(ReplyKeyboard $replyKeyboard) => $replyKeyboard
                 ->button(__('telegram_bot.menu.send_location'))->requestLocation())
             ->send();
-    }
-
-    public function weather_today()
-    {
-    }
-
-    public function weather_3d()
-    {
-    }
-
-    public function weather_week()
-    {
     }
 }
