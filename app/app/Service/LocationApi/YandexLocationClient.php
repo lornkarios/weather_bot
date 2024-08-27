@@ -38,6 +38,6 @@ class YandexLocationClient implements LocationApiClient
             return null;
         }
         $coordinatesArr = explode(' ', $coordinates);
-        return new Location($coordinates[0], $coordinates[1], $name);
+        return new Location($coordinatesArr[0], $coordinatesArr[1], $name);
     }
 }
