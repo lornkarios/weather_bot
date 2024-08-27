@@ -20,7 +20,7 @@ class OpenMeteoClient implements WeatherApiClient
         $this->url = config('services.open_meteo.url');
     }
 
-    public function today(Location $location): OneDayWeather
+    public function oneDayFormat(Location $location, int $days = 1): Collection
     {
         $response = $this->client->get(
             $this->url . '/v1/forecast',
@@ -31,27 +31,7 @@ class OpenMeteoClient implements WeatherApiClient
                     'hourly' => 'temperature_2m,precipitation,wind_speed_10m,weather_code',
                     'wind_speed_unit' => 'ms',
                     'timezone' => 'auto',
-                    'forecast_days' => 1,
-                ]
-            ]
-        );
-        $json = (string)$response->getBody();
-        $jsonArr = json_decode($json, true);
-        return $this->oneDayWeatherCollection($jsonArr)->first();
-    }
-
-    public function for3d(Location $location): Collection
-    {
-        $response = $this->client->get(
-            $this->url . '/v1/forecast',
-            [
-                'query' => [
-                    'latitude' => $location->lat,
-                    'longitude' => $location->lon,
-                    'hourly' => 'temperature_2m,precipitation,wind_speed_10m,weather_code',
-                    'wind_speed_unit' => 'ms',
-                    'timezone' => 'auto',
-                    'forecast_days' => 3,
+                    'forecast_days' => $days,
                 ]
             ]
         );
@@ -119,7 +99,7 @@ class OpenMeteoClient implements WeatherApiClient
         );
     }
 
-    public function forWeek(Location $location): Collection
+    public function manyDayFormat(Location $location, int $days = 7): Collection
     {
         $response = $this->client->get(
             $this->url . '/v1/forecast',
@@ -130,6 +110,7 @@ class OpenMeteoClient implements WeatherApiClient
                     'daily' => 'temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,weather_code',
                     'wind_speed_unit' => 'ms',
                     'timezone' => 'auto',
+                    'forecast_days' => $days,
                 ]
             ]
         );
@@ -151,7 +132,6 @@ class OpenMeteoClient implements WeatherApiClient
         }
         return $weatherCollection;
     }
-
 
     /**
      *

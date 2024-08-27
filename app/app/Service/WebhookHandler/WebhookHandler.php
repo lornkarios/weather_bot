@@ -83,10 +83,10 @@ class WebhookHandler extends AbstractWebhookHandler
     public function weather_today()
     {
         $location = $this->locationRepository->forChatFirst($this->chat);
-        $weatherForDay = $this->weatherApiClient->today($location);
+        $weatherForDay = $this->weatherApiClient->oneDayFormat($location, 1);
         $this->messageWithKeyboardMenuSend(
             $this->chat
-                ->message(view('today', ['weather' => $weatherForDay])->render())
+                ->message(view('today', ['weather' => $weatherForDay->first()])->render())
         );
         $this->reply('');
     }
@@ -94,7 +94,7 @@ class WebhookHandler extends AbstractWebhookHandler
     public function weather_3d()
     {
         $location = $this->locationRepository->forChatFirst($this->chat);
-        $weatherCollection = $this->weatherApiClient->for3d($location);
+        $weatherCollection = $this->weatherApiClient->oneDayFormat($location, 3);
         $this->messageWithKeyboardMenuSend(
             $this->chat
                 ->message(view('3days', ['weatherCollection' => $weatherCollection])->render())
@@ -105,7 +105,18 @@ class WebhookHandler extends AbstractWebhookHandler
     public function weather_week()
     {
         $location = $this->locationRepository->forChatFirst($this->chat);
-        $weatherCollection = $this->weatherApiClient->forWeek($location);
+        $weatherCollection = $this->weatherApiClient->manyDayFormat($location, 7);
+        $this->messageWithKeyboardMenuSend(
+            $this->chat
+                ->message(view('week', ['weatherCollection' => $weatherCollection])->render())
+        );
+        $this->reply('');
+    }
+
+    public function weather_2weeks()
+    {
+        $location = $this->locationRepository->forChatFirst($this->chat);
+        $weatherCollection = $this->weatherApiClient->manyDayFormat($location, 14);
         $this->messageWithKeyboardMenuSend(
             $this->chat
                 ->message(view('week', ['weatherCollection' => $weatherCollection])->render())
@@ -130,6 +141,9 @@ class WebhookHandler extends AbstractWebhookHandler
             ->row([
                 Button::make(__('telegram_bot.menu.weather_3d'))->action('weather_3d'),
                 Button::make(__('telegram_bot.menu.weather_week'))->action('weather_week'),
+            ])
+            ->row([
+                Button::make(__('telegram_bot.menu.weather_2weeks'))->action('weather_2weeks'),
             ])
         )
             ->send();

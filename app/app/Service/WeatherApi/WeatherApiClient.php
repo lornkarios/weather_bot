@@ -9,15 +9,13 @@ use Illuminate\Support\Collection;
 
 interface WeatherApiClient
 {
-    public function today(Location $location): OneDayWeather;
-
     /**
      * @return Collection|OneDayWeather[]
      */
-    public function for3d(Location $location): Collection;
+    public function oneDayFormat(Location $location, int $days = 1): Collection;
 
     /**
      * @return Collection|ManyDayWeather
      */
-    public function forWeek(Location $location):Collection;
+    public function manyDayFormat(Location $location, int $days = 7):Collection;
 }
